@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IndicVoice RAG - Low Latency Grounded Q&A</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Noto+Sans+Devanagari:wght@300;400;500;600;700&family=Noto+Sans+Bengali:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="index.css">
+    <!-- FontAwesome for beautiful icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="logo-area">
+                <i class="fa-solid fa-microphone-lines logo-icon"></i>
+                <div class="logo-text">
+                    <h1>IndicVoice <span class="accent-text">RAG</span></h1>
+                    <p class="tagline">Voice-to-Answer Grounded QA for Indic Languages</p>
+                </div>
+            </div>
+            <div class="hashtag-badge">
+                <span>#RAGInGoa</span>
+            </div>
+        </header>
+
+        <div class="main-layout">
+            <!-- Settings panel (Sidebar) -->
+            <aside class="sidebar">
+                <div class="card">
+                    <h3><i class="fa-solid fa-sliders"></i> Configuration</h3>
+                    
+                    <div class="form-group">
+                        <label for="lang-select">Target Language</label>
+                        <select id="lang-select">
+                            <option value="hi" selected>Hindi (हिन्दी)</option>
+                            <option value="bn">Bengali (বাংলা)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="strategy-select">Chunking & Retrieval</label>
+                        <select id="strategy-select">
+                            <option value="semantic" selected>Semantic Chunker</option>
+                            <option value="parent_child">Parent-Child Chunker</option>
+                            <option value="naive">Naive Word Splitter (Baseline)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="provider-select">LLM Provider</label>
+                        <select id="provider-select">
+                            <option value="gemini" selected>Gemini 2.5 Flash</option>
+                            <option value="groq">Groq (Llama-3-8b)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="topk-select">Retrieval Depth (Top-K)</label>
+                        <select id="topk-select">
+                            <option value="3" selected>3 Passages</option>
+                            <option value="5">5 Passages</option>
+                            <option value="10">10 Passages</option>
+                        </select>
+                    </div>
+
+                    <button id="seed-btn" class="secondary-btn">
+                        <i class="fa-solid fa-database"></i> Re-index Dataset
+                    </button>
+                </div>
+
+                <!-- Latency Analytics Summary Card -->
+                <div class="card latency-stats-card">
+                    <h3><i class="fa-solid fa-chart-line"></i> Benchmark Percentiles</h3>
+                    <div class="percentile-grid">
+                        <div class="percentile-box">
+                            <span class="p-label">P50</span>
+                            <span id="p50-val" class="p-val">-- ms</span>
+                        </div>
+                        <div class="percentile-box">
+                            <span class="p-label">P70</span>
+                            <span id="p70-val" class="p-val">-- ms</span>
+                        </div>
+                        <div class="percentile-box">
+                            <span class="p-label">P100</span>
+                            <span id="p100-val" class="p-val">-- ms</span>
+                        </div>
+                    </div>
+                    <p class="percentile-info">* Based on offline evaluation run of 30 queries.</p>
+                    <button id="run-bench-btn" class="primary-btn-outline">
+                        <i class="fa-solid fa-play"></i> Run Latency Benchmark
+                    </button>
+                </div>
+            </aside>
+
+            <!-- Main Interactive Section -->
+            <main class="content-area">
+                <!-- Record / Query Card -->
+                <div class="card interaction-card">
+                    <h2>Ask the Model</h2>
+                    <p class="sub-instructions">Speak your question in Hindi or Bengali, or type it below.</p>
+                    
+                    <div class="voice-input-container">
+                        <button id="record-btn" class="record-button">
+                            <i class="fa-solid fa-microphone record-icon"></i>
+                        </button>
+                        <div class="recording-state" id="record-state">
+                            <span class="state-indicator-dot"></span>
+                            <span id="state-text">Click microphone to record</span>
+                        </div>
+                    </div>
+
+                    <div class="text-input-container">
+                        <textarea id="query-input" placeholder="Type your query here... (e.g. रक्तचाप मापने के लिए सटीक रीडिंग प्राप्त करने की प्रक्रिया क्या है?)"></textarea>
+                        <div class="action-bar">
+                            <button id="submit-btn" class="primary-btn">
+                                <i class="fa-solid fa-paper-plane"></i> Submit Query
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Response Display Section -->
+                <div class="card result-card hidden" id="result-card">
+                    <div class="result-header">
+                        <h2>Response Summary</h2>
+                        <div class="badges-row">
+                            <span class="badge" id="grounded-badge">Grounded</span>
+                            <span class="badge" id="safety-badge">Safe</span>
+                        </div>
+                    </div>
+
+                    <!-- Query Transcript -->
+                    <div class="response-section">
+                        <h4><i class="fa-solid fa-quote-left"></i> Transcribed Query</h4>
+                        <p id="transcription-text" class="transcription-text"></p>
+                    </div>
+
+                    <!-- Generated Answer -->
+                    <div class="response-section">
+                        <h4><i class="fa-solid fa-wand-magic-sparkles"></i> Grounded Answer</h4>
+                        <div class="answer-box" id="answer-box"></div>
+                    </div>
+
+                    <!-- Grounding score metrics -->
+                    <div class="metrics-bar">
+                        <div class="metric-item">
+                            <span class="metric-label">Groundedness Score</span>
+                            <div class="metric-progress-container">
+                                <div class="metric-progress-bar" id="grounding-progress" style="width: 0%"></div>
+                            </div>
+                            <span class="metric-val" id="grounding-score-val">0%</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">Confidence</span>
+                            <div class="metric-progress-container">
+                                <div class="metric-progress-bar" id="confidence-progress" style="width: 0%"></div>
+                            </div>
+                            <span class="metric-val" id="confidence-score-val">0%</span>
+                        </div>
+                    </div>
+
+                    <!-- Latency breakdown visual -->
+                    <div class="response-section">
+                        <h4><i class="fa-solid fa-clock-rotate-left"></i> Latency Breakdown</h4>
+                        <div class="latency-timeline">
+                            <div class="latency-bar-segment stt" id="latency-stt-bar" style="width: 0%">
+                                <span class="tooltip">STT: -- ms</span>
+                                <span class="label">STT</span>
+                            </div>
+                            <div class="latency-bar-segment retrieval" id="latency-retrieval-bar" style="width: 0%">
+                                <span class="tooltip">Retrieval: -- ms</span>
+                                <span class="label">Retrieval</span>
+                            </div>
+                            <div class="latency-bar-segment generation" id="latency-generation-bar" style="width: 0%">
+                                <span class="tooltip">LLM Gen: -- ms</span>
+                                <span class="label">LLM Gen</span>
+                            </div>
+                            <div class="latency-bar-segment guardrails" id="latency-guardrails-bar" style="width: 0%">
+                                <span class="tooltip">Guardrails: -- ms</span>
+                                <span class="label">Guard</span>
+                            </div>
+                        </div>
+                        <div class="total-latency-text">
+                            Total Pipeline Execution Latency: <strong id="total-latency-val">0ms</strong>
+                        </div>
+                    </div>
+
+                    <!-- Retrieved Sources -->
+                    <div class="response-section">
+                        <h4><i class="fa-solid fa-book-open"></i> Retrieved Passages</h4>
+                        <div class="sources-list" id="sources-list"></div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="toast hidden"></div>
+</body>
+</html>

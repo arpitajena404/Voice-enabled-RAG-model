@@ -1,0 +1,29 @@
+# Environment variables
+.env
+
+# Python caching
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Local database & indexes
+# index/
+# data/
+
+# IDE files
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Audio recordings & temp files
+temp_audio.*
+*.wav
+*.webm
+*.mp3
+
+# Scratch directory
+scratch/
