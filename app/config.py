@@ -15,6 +15,11 @@ class Config:
     # Model Configurations
     EMBEDDING_MODEL_NAME = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
     
+    # Retry / backoff settings (used by tenacity in stt.py, pipeline.py)
+    RETRY_MAX_ATTEMPTS = int(os.getenv("RETRY_MAX_ATTEMPTS", "3"))
+    RETRY_BACKOFF_BASE = float(os.getenv("RETRY_BACKOFF_BASE", "1.0"))
+    RETRY_BACKOFF_MAX = float(os.getenv("RETRY_BACKOFF_MAX", "10.0"))
+    
     # Directory paths
     INDEX_DIR = ROOT_DIR / "index"
     DATA_DIR = ROOT_DIR / "data"

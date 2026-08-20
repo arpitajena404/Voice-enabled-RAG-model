@@ -79,7 +79,8 @@ async def handle_query(
             provider=provider,
             top_k=int(top_k)
         )
-        return res
+        # Serialize to the dict shape the frontend (app.js) expects
+        return res.to_api_dict()
         
     except Exception as e:
         logger.exception("Error handling pipeline query")
