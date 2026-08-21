@@ -41,16 +41,21 @@ def retrieve_passages(query: str, strategy: str = "semantic", top_k: int = 3, hy
         return []
 
     # 1. Dense Retrieval Score (Cosine Similarity)
-    import os
-    from app.config import config
-    if not config.GEMINI_API_KEY and not config.GROQ_API_KEY and not os.environ.get("USE_REAL_EMBEDDINGS"):
-        # Fast deterministic random query encoding for low-overhead offline execution
-        np.random.seed(hash(query) % (2**32 - 1))
-        query_emb = np.random.randn(384).astype(np.float32)
-    else:
-        model = indexer.get_embedding_model()
-        query_emb = model.encode(query, show_progress_bar=False)
-        query_emb = np.array(query_emb, dtype=np.float32)
+    #
+    # Always embed the query with the same real model used to embed the
+    # documents in indexer.py. A random-vector fallback was used here
+    # previously to skip model overhead when no LLM API key was set — but
+    # the embedding model is a local sentence-transformers model with no
+    # API key requirement at all, so that condition never had anything to
+    # do with whether real embeddings were available. The practical effect
+    # was that dense retrieval returned meaningless (random) similarity
+    # scores by default, leaving only the sparse/TF-IDF half doing real
+    # work. The model is lazy-loaded and cached (see get_embedding_model),
+    # so encoding one short query string here costs milliseconds once
+    # warm — not a meaningful hit to the 200ms budget.
+    model = indexer.get_embedding_model()
+    query_emb = model.encode(query, show_progress_bar=False)
+    query_emb = np.array(query_emb, dtype=np.float32)
     
     # Norms for division
     q_norm = np.linalg.norm(query_emb)

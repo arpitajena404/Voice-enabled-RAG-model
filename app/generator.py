@@ -137,7 +137,7 @@ async def _generate_answer_groq(prompt: str, query: str, language: str) -> RAGRe
         )
         
         completion = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
+            model="openai/gpt-oss-120b",
             messages=[
                 {"role": "system", "content": system_msg},
                 {"role": "user", "content": prompt}
