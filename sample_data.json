@@ -1,0 +1,442 @@
+[
+  {
+    "query": "sample query 0",
+    "answers": [
+      "The Reserve Bank of India regulates mone"
+    ],
+    "passages": [
+      {
+        "passage_text": "The Reserve Bank of India regulates monetary policy and issues currency notes.",
+        "is_selected": 1
+      },
+      {
+        "passage_text": "Photosynthesis converts sunlight, water, and carbon dioxide into glucose and oxygen.",
+        "is_selected": 0
+      },
+      {
+        "passage_text": "The Indian Premier League is a professional Twenty20 cricket league founded in 2008.",
+        "is_selected": 0
+      }
+    ],
+    "source_lang": "eng_Latn",
+    "target_lang": "hi_synthetic"
+  },
+  {
+    "query": "sample query 1",
+    "answers": [
+      "Photosynthesis converts sunlight, water,"
+    ],
+    "passages": [
+      {
+        "passage_text": "Photosynthesis converts sunlight, water, and carbon dioxide into glucose and oxygen.",
+        "is_selected": 1
+      },
+      {
+        "passage_text": "The Indian Premier League is a professional Twenty20 cricket league founded in 2008.",
+        "is_selected": 0
+      },
+      {
+        "passage_text": "Mount Everest, located in the Himalayas, is the tallest mountain above sea level.",
+        "is_selected": 0
+      }
+    ],
+    "source_lang": "eng_Latn",
+    "target_lang": "hi_synthetic"
+  },
+  {
+    "query": "sample query 2",
+    "answers": [
+      "The Indian Premier League is a professio"
+    ],
+    "passages": [
+      {
+        "passage_text": "The Indian Premier League is a professional Twenty20 cricket league founded in 2008.",
+        "is_selected": 1
+      },
+      {
+        "passage_text": "Mount Everest, located in the Himalayas, is the tallest mountain above sea level.",
+        "is_selected": 0
+      },
+      {
+        "passage_text": "The Constitution of India was adopted on 26 January 1950.",
+        "is_selected": 0
+      }
+    ],
+    "source_lang": "eng_Latn",
+    "target_lang": "hi_synthetic"
+  },
+  {
+    "query": "sample query 3",
+    "answers": [
+      "Mount Everest, located in the Himalayas,"
+    ],
+    "passages": [
+      {
+        "passage_text": "Mount Everest, located in the Himalayas, is the tallest mountain above sea level.",
+        "is_selected": 1
+      },
+      {
+        "passage_text": "The Constitution of India was adopted on 26 January 1950.",
+        "is_selected": 0
+      },
+      {
+        "passage_text": "A vector database stores embeddings and supports approximate nearest neighbor search.",
+        "is_selected": 0
+      }
+    ],
+    "source_lang": "eng_Latn",
+    "target_lang": "hi_synthetic"
+  },
+  {
+    "query": "sample query 4",
+    "answers": [
+      "The Constitution of India was adopted on"
+    ],
+    "passages": [
+      {
+        "passage_text": "The Constitution of India was adopted on 26 January 1950.",
+        "is_selected": 1
+      },
+      {
+        "passage_text": "A vector database stores embeddings and supports approximate nearest neighbor search.",
+        "is_selected": 0
+      },
+      {
+        "passage_text": "The Taj Mahal was built by Mughal emperor Shah Jahan in memory of his wife.",
+        "is_selected": 0
+      }
+    ],
+    "source_lang": "eng_Latn",
+    "target_lang": "hi_synthetic"
+  },
+  {
+    "query": "sample query 5",
+    "answers": [
+      "A vector database stores embeddings and "
+    ],
+    "passages": [
+      {
+        "passage_text": "A vector database stores embeddings and supports approximate nearest neighbor search.",
+        "is_selected": 1
+      },
+      {
+        "passage_text": "The Taj Mahal was built by Mughal emperor Shah Jahan in memory of his wife.",
+        "is_selected": 0
+      },
+      {
+        "passage_text": "Machine learning models learn patterns from data instead of explicit rules.",
+        "is_selected": 0
+      }
+    ],
+    "source_lang": "eng_Latn",
+    "target_lang": "hi_synthetic"
+  },
+  {
+    "query": "sample query 6",
+    "answers": [
+      "The Taj Mahal was built by Mughal empero"
+    ],
+    "passages": [
+      {
+        "passage_text": "The Taj Mahal was built by Mughal emperor Shah Jahan in memory of his wife.",
+        "is_selected": 1
+      },
+      {
+        "passage_text": "Machine learning models learn patterns from data instead of explicit rules.",
+        "is_selected": 0
+      },
+      {
+        "passage_text": "The Reserve Bank of India regulates monetary policy and issues currency notes.",
+        "is_selected": 0
+      }
+    ],
+    "source_lang": "eng_Latn",
+    "target_lang": "hi_synthetic"
+  },
+  {
+    "query": "sample query 7",
+    "answers": [
+      "Machine learning models learn patterns f"
+    ],
+    "passages": [
+      {
+        "passage_text": "Machine learning models learn patterns from data instead of explicit rules.",
+        "is_selected": 1
+      },
+      {
+        "passage_text": "The Reserve Bank of India regulates monetary policy and issues currency notes.",
+        "is_selected": 0
+      },
+      {
+        "passage_text": "Photosynthesis converts sunlight, water, and carbon dioxide into glucose and oxygen.",
+        "is_selected": 0
+      }
+    ],
+    "source_lang": "eng_Latn",
+    "target_lang": "hi_synthetic"
+  },
+  {
+    "query": "sample query 8",
+    "answers": [
+      "The Reserve Bank of India regulates mone"
+    ],
+    "passages": [
+      {
+        "passage_text": "The Reserve Bank of India regulates monetary policy and issues currency notes.",
+        "is_selected": 1
+      },
+      {
+        "passage_text": "Photosynthesis converts sunlight, water, and carbon dioxide into glucose and oxygen.",
+        "is_selected": 0
+      },
+      {
+        "passage_text": "The Indian Premier League is a professional Twenty20 cricket league founded in 2008.",
+        "is_selected": 0
+      }
+    ],
+    "source_lang": "eng_Latn",
+    "target_lang": "hi_synthetic"
+  },
+  {
+    "query": "sample query 9",
+    "answers": [
+      "Photosynthesis converts sunlight, water,"
+    ],
+    "passages": [
+      {
+        "passage_text": "Photosynthesis converts sunlight, water, and carbon dioxide into glucose and oxygen.",
+        "is_selected": 1
+      },
+      {
+        "passage_text": "The Indian Premier League is a professional Twenty20 cricket league founded in 2008.",
+        "is_selected": 0
+      },
+      {
+        "passage_text": "Mount Everest, located in the Himalayas, is the tallest mountain above sea level.",
+        "is_selected": 0
+      }
+    ],
+    "source_lang": "eng_Latn",
+    "target_lang": "hi_synthetic"
+  },
+  {
+    "query": "sample query 10",
+    "answers": [
+      "The Indian Premier League is a professio"
+    ],
+    "passages": [
+      {
+        "passage_text": "The Indian Premier League is a professional Twenty20 cricket league founded in 2008.",
+        "is_selected": 1
+      },
+      {
+        "passage_text": "Mount Everest, located in the Himalayas, is the tallest mountain above sea level.",
+        "is_selected": 0
+      },
+      {
+        "passage_text": "The Constitution of India was adopted on 26 January 1950.",
+        "is_selected": 0
+      }
+    ],
+    "source_lang": "eng_Latn",
+    "target_lang": "hi_synthetic"
+  },
+  {
+    "query": "sample query 11",
+    "answers": [
+      "Mount Everest, located in the Himalayas,"
+    ],
+    "passages": [
+      {
+        "passage_text": "Mount Everest, located in the Himalayas, is the tallest mountain above sea level.",
+        "is_selected": 1
+      },
+      {
+        "passage_text": "The Constitution of India was adopted on 26 January 1950.",
+        "is_selected": 0
+      },
+      {
+        "passage_text": "A vector database stores embeddings and supports approximate nearest neighbor search.",
+        "is_selected": 0
+      }
+    ],
+    "source_lang": "eng_Latn",
+    "target_lang": "hi_synthetic"
+  },
+  {
+    "query": "sample query 12",
+    "answers": [
+      "The Constitution of India was adopted on"
+    ],
+    "passages": [
+      {
+        "passage_text": "The Constitution of India was adopted on 26 January 1950.",
+        "is_selected": 1
+      },
+      {
+        "passage_text": "A vector database stores embeddings and supports approximate nearest neighbor search.",
+        "is_selected": 0
+      },
+      {
+        "passage_text": "The Taj Mahal was built by Mughal emperor Shah Jahan in memory of his wife.",
+        "is_selected": 0
+      }
+    ],
+    "source_lang": "eng_Latn",
+    "target_lang": "hi_synthetic"
+  },
+  {
+    "query": "sample query 13",
+    "answers": [
+      "A vector database stores embeddings and "
+    ],
+    "passages": [
+      {
+        "passage_text": "A vector database stores embeddings and supports approximate nearest neighbor search.",
+        "is_selected": 1
+      },
+      {
+        "passage_text": "The Taj Mahal was built by Mughal emperor Shah Jahan in memory of his wife.",
+        "is_selected": 0
+      },
+      {
+        "passage_text": "Machine learning models learn patterns from data instead of explicit rules.",
+        "is_selected": 0
+      }
+    ],
+    "source_lang": "eng_Latn",
+    "target_lang": "hi_synthetic"
+  },
+  {
+    "query": "sample query 14",
+    "answers": [
+      "The Taj Mahal was built by Mughal empero"
+    ],
+    "passages": [
+      {
+        "passage_text": "The Taj Mahal was built by Mughal emperor Shah Jahan in memory of his wife.",
+        "is_selected": 1
+      },
+      {
+        "passage_text": "Machine learning models learn patterns from data instead of explicit rules.",
+        "is_selected": 0
+      },
+      {
+        "passage_text": "The Reserve Bank of India regulates monetary policy and issues currency notes.",
+        "is_selected": 0
+      }
+    ],
+    "source_lang": "eng_Latn",
+    "target_lang": "hi_synthetic"
+  },
+  {
+    "query": "sample query 15",
+    "answers": [
+      "Machine learning models learn patterns f"
+    ],
+    "passages": [
+      {
+        "passage_text": "Machine learning models learn patterns from data instead of explicit rules.",
+        "is_selected": 1
+      },
+      {
+        "passage_text": "The Reserve Bank of India regulates monetary policy and issues currency notes.",
+        "is_selected": 0
+      },
+      {
+        "passage_text": "Photosynthesis converts sunlight, water, and carbon dioxide into glucose and oxygen.",
+        "is_selected": 0
+      }
+    ],
+    "source_lang": "eng_Latn",
+    "target_lang": "hi_synthetic"
+  },
+  {
+    "query": "sample query 16",
+    "answers": [
+      "The Reserve Bank of India regulates mone"
+    ],
+    "passages": [
+      {
+        "passage_text": "The Reserve Bank of India regulates monetary policy and issues currency notes.",
+        "is_selected": 1
+      },
+      {
+        "passage_text": "Photosynthesis converts sunlight, water, and carbon dioxide into glucose and oxygen.",
+        "is_selected": 0
+      },
+      {
+        "passage_text": "The Indian Premier League is a professional Twenty20 cricket league founded in 2008.",
+        "is_selected": 0
+      }
+    ],
+    "source_lang": "eng_Latn",
+    "target_lang": "hi_synthetic"
+  },
+  {
+    "query": "sample query 17",
+    "answers": [
+      "Photosynthesis converts sunlight, water,"
+    ],
+    "passages": [
+      {
+        "passage_text": "Photosynthesis converts sunlight, water, and carbon dioxide into glucose and oxygen.",
+        "is_selected": 1
+      },
+      {
+        "passage_text": "The Indian Premier League is a professional Twenty20 cricket league founded in 2008.",
+        "is_selected": 0
+      },
+      {
+        "passage_text": "Mount Everest, located in the Himalayas, is the tallest mountain above sea level.",
+        "is_selected": 0
+      }
+    ],
+    "source_lang": "eng_Latn",
+    "target_lang": "hi_synthetic"
+  },
+  {
+    "query": "sample query 18",
+    "answers": [
+      "The Indian Premier League is a professio"
+    ],
+    "passages": [
+      {
+        "passage_text": "The Indian Premier League is a professional Twenty20 cricket league founded in 2008.",
+        "is_selected": 1
+      },
+      {
+        "passage_text": "Mount Everest, located in the Himalayas, is the tallest mountain above sea level.",
+        "is_selected": 0
+      },
+      {
+        "passage_text": "The Constitution of India was adopted on 26 January 1950.",
+        "is_selected": 0
+      }
+    ],
+    "source_lang": "eng_Latn",
+    "target_lang": "hi_synthetic"
+  },
+  {
+    "query": "sample query 19",
+    "answers": [
+      "Mount Everest, located in the Himalayas,"
+    ],
+    "passages": [
+      {
+        "passage_text": "Mount Everest, located in the Himalayas, is the tallest mountain above sea level.",
+        "is_selected": 1
+      },
+      {
+        "passage_text": "The Constitution of India was adopted on 26 January 1950.",
+        "is_selected": 0
+      },
+      {
+        "passage_text": "A vector database stores embeddings and supports approximate nearest neighbor search.",
+        "is_selected": 0
+      }
+    ],
+    "source_lang": "eng_Latn",
+    "target_lang": "hi_synthetic"
+  }
+]
