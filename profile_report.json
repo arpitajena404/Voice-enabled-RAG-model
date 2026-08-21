@@ -1,0 +1,11 @@
+{
+  "num_passages": 60,
+  "num_queries": 20,
+  "avg_passages_per_query": 3.0,
+  "word_count_min": 10,
+  "word_count_max": 15,
+  "word_count_mean": 12.0,
+  "word_count_median": 12.0,
+  "word_count_p90": 15,
+  "empty_or_near_empty": 0
+}

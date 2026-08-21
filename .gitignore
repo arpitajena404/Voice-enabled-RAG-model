@@ -28,3 +28,6 @@ temp_audio.*
 
 # Scratch directory
 scratch/
+
+data/
+index/

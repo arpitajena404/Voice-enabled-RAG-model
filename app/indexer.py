@@ -36,58 +36,71 @@ class IndicIndexer:
             lang = item.get("language", "hi")
             query_id = item.get("query_id", "")
             
-            # Combine all passages for indexing
             passages_data = item.get("passages", {})
             passage_texts = passages_data.get("passage_text", [])
             urls = passages_data.get("url", [])
+            is_selected_list = passages_data.get("is_selected", [])
             
             # Fallback to original passages if translation is missing
             if not passage_texts:
                 passages_data = item.get("original_passages", {})
                 passage_texts = passages_data.get("passage_text", [])
                 urls = passages_data.get("url", [])
-                
-            full_text = " ".join(passage_texts)
-            if not full_text.strip():
-                continue
-                
-            url = urls[0] if urls else ""
-            
-            if strategy == "naive":
-                strategy_chunks = chunk_naive(full_text)
-                for chunk in strategy_chunks:
-                    chunks.append(chunk)
-                    metadata.append({
-                        "language": lang,
-                        "query_id": query_id,
-                        "url": url,
-                        "chunk_type": "naive"
-                    })
-            elif strategy == "semantic":
-                strategy_chunks = chunk_semantic(full_text, model)
-                for chunk in strategy_chunks:
-                    chunks.append(chunk)
-                    metadata.append({
-                        "language": lang,
-                        "query_id": query_id,
-                        "url": url,
-                        "chunk_type": "semantic"
-                    })
-            elif strategy == "parent_child":
-                # Create child chunks that point to the parent text
-                parent_text = full_text
-                strategy_chunks = chunk_parent_child(parent_text, str(idx))
-                for child in strategy_chunks:
-                    chunks.append(child["child_text"])
-                    metadata.append({
-                        "language": lang,
-                        "query_id": query_id,
-                        "url": url,
-                        "parent_text": child["parent_text"],
-                        "chunk_type": "child"
-                    })
-            else:
-                raise ValueError(f"Unknown chunking strategy: {strategy}")
+                is_selected_list = passages_data.get("is_selected", [])
+
+            # Chunk each passage independently rather than joining them into
+            # one blob first. Joining before chunking lets a single chunk
+            # span content from two unrelated passages, which muddies both
+            # retrieval precision and the parent-child hierarchy. Chunking
+            # per-passage also lets us carry `is_selected` (the dataset's
+            # own relevance label) through to each chunk instead of losing
+            # it at the join step.
+            for p_idx, passage_text in enumerate(passage_texts):
+                if not passage_text.strip():
+                    continue
+
+                url = urls[p_idx] if p_idx < len(urls) else ""
+                is_selected = bool(is_selected_list[p_idx]) if p_idx < len(is_selected_list) else False
+
+                if strategy == "naive":
+                    strategy_chunks = chunk_naive(passage_text)
+                    for chunk in strategy_chunks:
+                        chunks.append(chunk)
+                        metadata.append({
+                            "language": lang,
+                            "query_id": query_id,
+                            "url": url,
+                            "chunk_type": "naive",
+                            "is_selected": is_selected,
+                        })
+                elif strategy == "semantic":
+                    strategy_chunks = chunk_semantic(passage_text, model)
+                    for chunk in strategy_chunks:
+                        chunks.append(chunk)
+                        metadata.append({
+                            "language": lang,
+                            "query_id": query_id,
+                            "url": url,
+                            "chunk_type": "semantic",
+                            "is_selected": is_selected,
+                        })
+                elif strategy == "parent_child":
+                    # Parent is this single passage, not the whole
+                    # concatenated set — keeps parent context focused
+                    # instead of pulling in unrelated passages.
+                    strategy_chunks = chunk_parent_child(passage_text, f"{idx}_{p_idx}")
+                    for child in strategy_chunks:
+                        chunks.append(child["child_text"])
+                        metadata.append({
+                            "language": lang,
+                            "query_id": query_id,
+                            "url": url,
+                            "parent_text": child["parent_text"],
+                            "chunk_type": "child",
+                            "is_selected": is_selected,
+                        })
+                else:
+                    raise ValueError(f"Unknown chunking strategy: {strategy}")
 
         if not chunks:
             logger.warning(f"No chunks created for strategy {strategy}")
