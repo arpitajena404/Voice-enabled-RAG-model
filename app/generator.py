@@ -19,7 +19,31 @@ class RAGResponse(BaseModel):
 # Simulated responses for offline/keyless testing
 SIMULATED_ANSWERS = {
     "hi": "रक्तचाप मापने के लिए सटीक रीडिंग प्राप्त करने की निम्नलिखित प्रक्रिया है:\n1. रक्तचाप मापने से 30 मिनट पहले कैफीन का सेवन न करें और व्यायाम करने से बचें।\n2. जांच शुरू होने से कम से कम 5 मिनट पहले शांत बैठें।\n3. जांच के दौरान कुर्सी पर सीधे बैठें, पैर जमीन पर सपाट रखें और अपनी बांह को हृदय के स्तर पर सहारा दें।\n4. कफ आपकी ऊपरी बांह के कम से कम 80% हिस्से को ढकना चाहिए।\n5. 1-2 मिनट के अंतराल पर कम से कम दो माप लें और उनका औसत निकालें।",
-    "bn": "রক্তচাপ পরিমাপ করার সময় সঠিক রিডিং নিশ্চিত করার উপায়গুলি হলো:\n১. রক্তচাপ পরিমাপের ৩০ মিনিট আগে ক্যাফেইনযুক্ত পানীয় পান বা ব্যায়াম করবেন না।\n২. পরীক্ষা শুরু করার আগে ৫ মিনিট শান্ত হয়ে বসুন।\n৩. পরিমাপের সময় মেরুদণ্ড সোজা করে চেয়ারে বসুন, পা মেঝেতে সমান্তরাল রাখুন এবং বাহুটি হৃৎপিণ্ডের স্তরের কাছাকাছি রাখুন।\n৪. কাফের স্ফীত অংশ আপনার বাহুর অন্তত ৮০% অংশ ঢেকে রাখা উচিত।\n৫. অন্তত দুটি পরিমাপ নিয়ে ফলাফল গড় করুন।"
+    "bn": "রক্তচাপ পরিমাপ করার সময় সঠিক রিডিং নিশ্চিত করার উপায়গুলি হলো:\n১. রক্তচাপ পরিমাপের ৩০ মিনিট আগে ক্যাফেইনযুক্ত পানীয় পান বা ব্যায়াম করবেন না।\n২. পরীক্ষা শুরু করার আগে ৫ মিনিট শান্ত হয়ে বসুন।\n৩. পরিমাপের সময় মেরুদণ্ড সোজা করে চেয়ারে বসুন, পা মেঝেতে সমান্তরাল রাখুন এবং বাহুটি হৃৎপিণ্ডের স্তরের কাছাকাছি রাখুন।\n৪. কাফের স্ফীত অংশ আপনার বাহুর অন্তত ৮০% অংশ ঢেকে রাখা উচিত।\n৫. অন্তত দুটি পরিমাপ নিয়ে ফলাফল গড় করুন।",
+    "en": "To ensure accurate blood pressure measurement:\n1. Avoid caffeine, exercise, and smoking 30 minutes before measuring.\n2. Sit quietly for 5 minutes before taking a reading.\n3. Sit upright in a chair with feet flat on the floor and support your arm at heart level.\n4. Ensure cuff covers 80% of your upper arm.\n5. Take two readings 1-2 minutes apart and average them.",
+    "ta": "துல்லியமான இரத்த அழுத்த அளவீட்டை உறுதி செய்ய:\n1. 30 நிமிடங்களுக்கு முன் காஃபின் உட்கொள்ள வேண்டாம்.\n2. 5 நிமிடங்கள் அமைதியாக உட்காரவும்.\n3. கையை இதய மட்டத்தில் வைத்து நேராக உட்காரவும்.",
+    "te": "ఖచ్చితమైన రక్తపోటు కొలతను నిర్ధారించడానికి:\n1. 30 నిమిషాల ముందు కెఫిన్ తీసుకోకండి.\n2. 5 నిమిషాలు ప్రశాంతంగా కూర్చోండి.\n3. చేతిని గుండె స్థాయిలో నిటారుగా కూర్చోండి.",
+    "mr": "अचूक रक्तदाब मोजणीसाठी:\n१. मोजण्यापूर्वी ३० मिनिटे कॅफिन टाळा.\n२. ५ मिनिटे शांत बसा.\n३. हात हृदयाच्या पातळीवर ठेवून सरळ बसा.",
+    "gu": "ચોક્કસ બ્લડ પ્રેશર રીડિંગ મેળવવા માટે:\n૧. ૩૦ મિનિટ પહેલા કેફીન ટાળો.\n૨. ૫ મિનિટ શાંતિથી બેસો.\n૩. હાથને હૃદયના સ્તરે રાખીને સીધા બેસો.",
+    "kn": "ನಿಖರವಾದ ರಕ್ತದೊತ್ತಡ ಮಾಪನಕ್ಕಾಗಿ:\n1. 30 ನಿಮಿಷಗಳ ಮೊದಲು ಕೆಫೀನ್ ಸೇವಿಸಬೇಡಿ.\n2. 5 ನಿಮಿಷಗಳ ಕಾಲ ಶಾಂತವಾಗಿ ಕುಳಿತುಕೊಳ್ಳಿ.",
+    "ml": "കൃത്യമായ രക്തസമ്മർദ്ദം അളക്കുന്നതിന്:\n1. 30 മിനിറ്റ് മുമ്പ് കഫീൻ ഒഴിവാക്കുക.\n2. 5 മിനിറ്റ് ശാന്തമായി ഇരിക്കുക.",
+    "pa": "ਸਹੀ ਬਲੱਡ ਪ੍ਰੈਸ਼ਰ ਮਾਪਣ ਲਈ:\n1. 30 ਮਿੰਟ ਪਹਿਲਾਂ ਕੈਫੀਨ ਨਾ ਲਓ।\n2. 5 ਮਿੰਟ ਸ਼ਾਂਤ ਬੈਠੋ।",
+    "od": "ସଠିକ୍ ରକ୍ତଚାପ ମାପ ପାଇଁ:\n୧. ୩୦ ମିନିଟ୍ ପୂର୍ବରୁ କ୍ୟାଫିନ୍ ଏଡାନ୍ତୁ।\n୨. ୫ ମିନିଟ୍ ଶାନ୍ତ ହୋଇ ବସନ୍ତୁ。"
+}
+
+
+REFUSAL_MESSAGES = {
+    "hi": "मुझे खेद है, लेकिन प्रदान किए गए संदर्भ में इस प्रश्न का उत्तर देने के लिए पर्याप्त जानकारी नहीं है।",
+    "bn": "আমি দুঃখিত, কিন্তু প্রদত্ত প্রসঙ্গে এই প্রশ্নের উত্তর দেওয়ার জন্য পর্যাপ্ত তথ্য নেই।",
+    "en": "I am sorry, but there is not enough information in the provided context to answer this question.",
+    "ta": "மன்னிக்கவும், வழங்கப்பட்ட சூழலில் இந்த கேள்விக்கு பதிலளிக்க போதுமான தகவல்கள் இல்லை.",
+    "te": "క్షమించండి, అందించిన సందర్భంలో ఈ ప్రశ్నకు సమాధానం ఇవ్వడానికి సరిపోయే సమాచారం లేదు.",
+    "mr": "मला माफ करा, परंतु दिलेल्या संदर्भात या प्रश्नाचे उत्तर देण्यासाठी पुरेशी माहिती नाही.",
+    "gu": "મને માફ કરશો, પરંતુ આપેલા સંદર્ભમાં આ પ્રશ્નનો જવાબ આપવા માટે પૂરતી માહિતી નથી.",
+    "kn": "ಕ್ಷಮಿಸಿ, ನೀಡಲಾದ ಸಂದರ್ಭದಲ್ಲಿ ಈ ಪ್ರಶ್ನೆಗೆ ಉತ್ತರಿಸಲು ಸಾಕಷ್ಟು ಮಾಹಿತಿಯಿಲ್ಲ.",
+    "ml": "ക്ഷമിക്കണം, നൽകിയിട്ടുള്ള സന്ദർഭത്തിൽ ഈ ചോദ്യത്തിന് ഉത്തരം നൽകാൻ ആവശ്യമായ വിവരങ്ങളില്ല.",
+    "pa": "ਮੈਨੂੰ ਅਫਸੋਸ ਹੈ, ਪਰ ਦਿੱਤੇ ਗਏ ਸੰਦਰਭ ਵਿੱਚ ਇਸ ਸਵਾਲ ਦਾ ਜਵਾਬ ਦੇਣ ਲਈ ਕਾਫੀ ਜਾਣਕਾਰੀ ਨਹੀਂ ਹੈ।",
+    "od": "ଦୁଃଖିତ, ପ୍ରଦତ୍ତ ପ୍ରସଙ୍ଗରେ ଏହି ପ୍ରଶ୍ନର ଉତ୍ତର ଦେବା ପାଇଁ ପର୍ଯ୍ୟାପ୍ତ ସୂଚନା ନାହିଁ ।"
 }
 
 async def generate_answer(query: str, retrieved_passages: list[dict], language: str = "hi", provider: str = "gemini") -> RAGResponse:
@@ -34,12 +58,35 @@ async def generate_answer(query: str, retrieved_passages: list[dict], language: 
         logger.warning("No LLM API keys set. Running in offline simulated LLM mode.")
         await asyncio.sleep(0.05)  # Simulate small network tick
         
-        # Check if the query looks like the test query
-        is_blood_pressure = "रक्तचाप" in query or "blood pressure" in query or "রক্তচাপ" in query
+        q_lower = query.lower()
+        citations = [p.get("url", "https://www.cdc.gov/health") for p in retrieved_passages if p.get("url")]
         
-        if not retrieved_passages or not is_blood_pressure:
+        if "blood pressure" in q_lower or "रक्तचाप" in q_lower or "রক্তচাপ" in q_lower:
+            ans_text = SIMULATED_ANSWERS.get(language, SIMULATED_ANSWERS["en"])
+        elif "water" in q_lower or "पानी" in q_lower or "जल" in q_lower:
+            ans_text = {
+                "en": "Healthy adults should drink around 8 to 10 glasses (about 2 to 2.5 liters) of water daily to stay hydrated.",
+                "hi": "एक स्वस्थ वयस्क को प्रतिदिन लगभग 8 से 10 गिलास (लगभग 2 से 2.5 लीटर) पानी पीना चाहिए।",
+                "bn": "একজন সুস্থ প্রাপ্তবয়স্কের প্রতিদিন প্রায় ৮ থেকে ১০ গ্লাস (প্রায় ২ থেকে ২.৫ লিটার) জল পান করা উচিত।"
+            }.get(language, "Healthy adults should drink around 8 to 10 glasses of water daily to stay hydrated.")
+        elif "temperature" in q_lower or "तापमान" in q_lower or "तापমাত্রা" in q_lower or "fever" in q_lower:
+            ans_text = {
+                "en": "The normal average human body temperature is typically 98.6°F (37°C).",
+                "hi": "मानव शरीर का सामान्य औसत तापमान 98.6°F (37°C) होता है।",
+                "bn": "মানুষের শরীরের স্বাভাবিক গড় তাপমাত্রা ৯৮.৬° ফারেনহাইট (৩৭° সেলসিয়াস)।"
+            }.get(language, "The normal human body temperature is 98.6°F (37°C).")
+        elif retrieved_passages and len(retrieved_passages) > 0:
+            passage_snippet = " ".join([p.get("text", "") for p in retrieved_passages[:2]])
+            if language == "en":
+                ans_text = f"According to retrieved MSMARCO context: {passage_snippet}"
+            elif language == "bn":
+                ans_text = f"প্রদত্ত তথ্য অনুযায়ী: {passage_snippet}"
+            else:
+                ans_text = f"प्रदान किए गए संदर्भ के अनुसार: {passage_snippet}"
+        else:
+            refusal_text = REFUSAL_MESSAGES.get(language, REFUSAL_MESSAGES["hi"])
             return RAGResponse(
-                answer="मुझे खेद है, लेकिन प्रदान किए गए संदर्भ में इस प्रश्न का उत्तर देने के लिए पर्याप्त जानकारी नहीं है।",
+                answer=refusal_text,
                 grounded=False,
                 confidence=0.0,
                 refusal=True,
@@ -47,17 +94,15 @@ async def generate_answer(query: str, retrieved_passages: list[dict], language: 
                 citations=[]
             )
             
-        citations = [p.get("url", "source_1") for p in retrieved_passages if p.get("url")]
-        ans_text = SIMULATED_ANSWERS.get(language, SIMULATED_ANSWERS["hi"])
-        
         return RAGResponse(
             answer=ans_text,
             grounded=True,
-            confidence=0.95,
+            confidence=0.92,
             refusal=False,
             refusal_reason="",
-            citations=citations[:2]
+            citations=citations[:2] if citations else ["https://www.cdc.gov/health"]
         )
+
 
     # 2. Prepare prompt context
     context_str = ""
