@@ -112,8 +112,17 @@ async def transcribe_audio(
         simulated_transcripts = {
             "hi": "रक्तचाप मापने के लिए सटीक रीडिंग प्राप्त करने की प्रक्रिया क्या है?",
             "bn": "রক্তচাপ মাপার জন্য সঠিক রিডিং নিশ্চিত করার উপায় কী?",
-            "en": "how to get accurate blood pressure reading"
+            "en": "What is the procedure to get accurate blood pressure reading?",
+            "ta": "இரத்த அழுத்தத்தை துல்லியமாக அளவிடுவதற்கான வழிமுறை என்ன?",
+            "te": "రక్తపోటును ఖచ్చితంగా కొలవడానికి విధానం ఏమిటి?",
+            "mr": "रक्तदाब अचूक मोजण्याची पद्धत काय आहे?",
+            "gu": "બ્લડ પ્રેશરનું ચોક્કસ રીડિંગ મેળવવાની પ્રક્રિયા શું છે?",
+            "kn": "ರಕ್ತದೊತ್ತಡವನ್ನು ನಿಖರವಾಗಿ ಅಳೆಯುವ ವಿಧಾನ ಯಾವುದು?",
+            "ml": "രക്തസമ്മർദ്ദം കൃത്യമായി അളക്കുന്നതിനുള്ള നടപടിക്രമം എന്താണ്?",
+            "pa": "ਬਲੱਡ ਪ੍ਰੈਸ਼ਰ ਦੀ ਸਹੀ ਰੀਡਿੰਗ ਲੈਣ ਦੀ ਪ੍ਰਕਿਰਿਆ ਕੀ ਹੈ?",
+            "od": "ରକ୍ତଚାପର ସଠିକ୍ ରିଡିଂ ପାଇବା ପାଇଁ ପ୍ରକ୍ରିୟା କ’ଣ?"
         }
+
         return TranscriptionResult(
             text=simulated_transcripts.get(language_code, simulated_transcripts["hi"]),
             language_code=language_code,

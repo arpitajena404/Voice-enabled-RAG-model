@@ -8,8 +8,9 @@ from tenacity import (
 )
 from app.stt import transcribe_audio
 from app.retriever import retrieve_passages
-from app.generator import generate_answer, RAGResponse
-from app.guardrails import check_input_safety, check_grounding
+from app.generator import generate_answer, RAGResponse, REFUSAL_MESSAGES
+
+from app.guardrails import check_input_safety, check_off_topic, check_grounding
 from app.config import config
 from app.schemas import (
     TranscriptionResult,
@@ -37,6 +38,24 @@ def _generation_retry():
         before_sleep=before_sleep_log(logger, logging.WARNING),
         reraise=True,
     )
+
+
+def _detect_query_language(query_text: str, fallback_lang: str) -> str:
+    """Auto-detects language based on character script (Hindi, Bengali, Tamil, Telugu, English)."""
+    cleaned = "".join(c for c in query_text if c.isalnum())
+    if not cleaned:
+        return fallback_lang
+    if any('\u0900' <= c <= '\u097F' for c in cleaned):
+        return "hi"
+    if any('\u0980' <= c <= '\u09FF' for c in cleaned):
+        return "bn"
+    if any('\u0B80' <= c <= '\u0BFF' for c in cleaned):
+        return "ta"
+    if any('\u0C00' <= c <= '\u0C7F' for c in cleaned):
+        return "te"
+    if all(ord(c) < 128 for c in cleaned):
+        return "en"
+    return fallback_lang
 
 
 class RAGPipeline:
@@ -85,7 +104,7 @@ class RAGPipeline:
                         return PipelineResponse(
                             error=f"Speech transcription failed: {str(e)}",
                             query="",
-                            answer="मुझे खेद है, मैं आपकी आवाज़ को समझ नहीं पाया। कृपया पुनः प्रयास करें।",
+                            answer="Speech transcription failed. Please try again.",
                             grounded=False,
                             refusal=True,
                             refusal_reason="STT transcription error",
@@ -100,23 +119,32 @@ class RAGPipeline:
                 return PipelineResponse(
                     error="Query is empty",
                     query="",
-                    answer="कृपया एक प्रश्न पूछें।",
+                    answer="Please ask a question.",
                     grounded=False,
                     refusal=True,
                     refusal_reason="Empty query",
                     latencies=latencies,
                 )
 
+            # Auto-detect language script
+            effective_lang = _detect_query_language(query, language)
+
             # ── 2. Input Guardrails ──────────────────────────────────
             with timed_stage_sync("guardrails_input") as t_gi:
                 is_safe, safety_reason = check_input_safety(query)
+                if is_safe:
+                    is_off_topic, off_topic_reason = check_off_topic(query)
+                    if is_off_topic:
+                        is_safe = False
+                        safety_reason = off_topic_reason
 
             if not is_safe:
                 latencies["guardrails"] = t_gi.latency_ms
                 latencies["total"] = t_total.latency_ms  # will be filled on exit but set early for the return
+                refusal_msg = REFUSAL_MESSAGES.get(effective_lang, REFUSAL_MESSAGES["hi"])
                 return PipelineResponse(
                     query=query,
-                    answer="मुझे खेद है, लेकिन मैं इस प्रकार के प्रश्नों का उत्तर नहीं दे सकता।",
+                    answer=refusal_msg,
                     grounded=False,
                     confidence=0.0,
                     refusal=True,
@@ -139,7 +167,7 @@ class RAGPipeline:
                     return PipelineResponse(
                         error=f"Retrieval failed: {str(e)}",
                         query=query,
-                        answer="रिफ्रेश करते समय कुछ गलत हुआ। कृपया थोड़ी देर बाद पुनः प्रयास करें।",
+                        answer=REFUSAL_MESSAGES.get(effective_lang, REFUSAL_MESSAGES["hi"]),
                         grounded=False,
                         refusal=True,
                         refusal_reason="Retrieval system error",
@@ -160,7 +188,7 @@ class RAGPipeline:
                     llm_response: RAGResponse = await retrying_generate(
                         query=query,
                         retrieved_passages=passages,
-                        language=language,
+                        language=effective_lang,
                         provider=provider,
                     )
                 except Exception as e:
@@ -170,7 +198,7 @@ class RAGPipeline:
                     return PipelineResponse(
                         error=f"LLM generation failed: {str(e)}",
                         query=query,
-                        answer="उत्तर उत्पन्न करने में समस्या हुई। कृपया पुनः प्रयास करें।",
+                        answer=REFUSAL_MESSAGES.get(effective_lang, REFUSAL_MESSAGES["hi"]),
                         grounded=False,
                         refusal=True,
                         refusal_reason="LLM generation error",
@@ -178,6 +206,7 @@ class RAGPipeline:
                     )
             latencies["generation"] = t_gen.latency_ms
             logger.info(f"LLM Generation completed in {latencies['generation']:.2f}ms.")
+
 
             # ── 5. Output Grounding Guardrail ─────────────────────────
             with timed_stage_sync("guardrails_output") as t_go:
@@ -199,7 +228,8 @@ class RAGPipeline:
             answer_final = llm_response.answer
             if refusal_final and not llm_response.refusal:
                 refusal_reason_final = "Output grounding guardrail failure"
-                answer_final = "मुझे खेद है, लेकिन प्रदान किए गए संदर्भ में इस प्रश्न का उत्तर देने के लिए पर्याप्त जानकारी नहीं है।"
+                answer_final = REFUSAL_MESSAGES.get(language, REFUSAL_MESSAGES["hi"])
+
 
         # t_total context exited → latency is filled
         latencies["total"] = t_total.latency_ms

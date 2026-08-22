@@ -140,5 +140,6 @@ class TestTranscribeAudioFallback:
         result = await transcribe_audio(b"fake-audio", "test.wav", "en")
 
         assert result.used_fallback is True
-        assert result.text == "how to get accurate blood pressure reading"
+        assert result.text == "What is the procedure to get accurate blood pressure reading?"
         assert result.language_code == "en"
+

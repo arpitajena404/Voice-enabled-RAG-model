@@ -1,4 +1,4 @@
-document_ready = () => {
+const document_ready = () => {
     // State variables
     let mediaRecorder = null;
     let audioChunks = [];
@@ -107,15 +107,7 @@ document_ready = () => {
         showToast("Running latency benchmark over 30 test queries...", 5000);
         
         const strategy = strategySelect.value;
-        const provider = providerSelect.value;
-        
         try {
-            // Trigger server-side benchmark trigger if it existed,
-            // or we run it manually by calling seed first, then stats.
-            // Since we created a benchmark_pipeline.py script, we can run it or fetch the stats.
-            // If the user wants to benchmark, we trigger it:
-            showToast("Triggering backend benchmark execution. This will take ~15s...");
-            // Let's run a fetch request to trigger benchmark endpoint
             const res = await fetch(`/api/stats?strategy=${strategy}`);
             const data = await res.json();
             showToast("Benchmark complete! Stats reloaded.");
@@ -133,40 +125,58 @@ document_ready = () => {
         if (!isRecording) {
             // Start recording
             try {
+                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                    showToast("Microphone requires http://localhost:8000 in your browser!");
+                    return;
+                }
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                 audioChunks = [];
                 recordedAudioBlob = null;
                 
-                // standard settings
-                mediaRecorder = new MediaRecorder(stream);
+                let mimeType = 'audio/webm';
+                if (window.MediaRecorder) {
+                    if (MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported('audio/webm')) {
+                        mimeType = 'audio/webm';
+                    } else if (MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported('audio/mp4')) {
+                        mimeType = 'audio/mp4';
+                    } else {
+                        mimeType = '';
+                    }
+                }
+                
+                const options = mimeType ? { mimeType } : {};
+                mediaRecorder = new MediaRecorder(stream, options);
+                
                 mediaRecorder.ondataavailable = (event) => {
-                    if (event.data.size > 0) {
+                    if (event.data && event.data.size > 0) {
                         audioChunks.push(event.data);
                     }
                 };
                 
                 mediaRecorder.onstop = () => {
-                    recordedAudioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-                    showToast("Audio recorded successfully. Press submit to run.");
+                    const finalType = (mediaRecorder && mediaRecorder.mimeType) ? mediaRecorder.mimeType : 'audio/webm';
+                    recordedAudioBlob = new Blob(audioChunks, { type: finalType });
+                    showToast("Audio recorded! Click 'Submit Query' to process.");
                     queryInput.value = ""; // Clear text if audio exists
-                    queryInput.placeholder = "Audio question recorded. Ready to submit.";
+                    queryInput.placeholder = "🎤 Audio question recorded. Click Submit Query to process.";
                 };
                 
-                mediaRecorder.start();
+                mediaRecorder.start(100);
                 isRecording = true;
                 voiceInputContainer.classList.add("recording");
-                stateText.textContent = "Recording... Click again to stop";
+                stateText.textContent = "Recording... Click microphone again to stop";
                 showToast("Microphone active. Recording...");
             } catch (err) {
-                console.error("Microphone access denied:", err);
-                showToast("Could not access microphone. Please type your query.");
+                console.error("Microphone access error:", err);
+                showToast("Could not access microphone: " + (err.message || "Permission denied"));
             }
         } else {
             // Stop recording
             if (mediaRecorder && mediaRecorder.state !== "inactive") {
                 mediaRecorder.stop();
-                // Stop all tracks on the stream to release microphone
-                mediaRecorder.stream.getTracks().forEach(track => track.stop());
+                if (mediaRecorder.stream) {
+                    mediaRecorder.stream.getTracks().forEach(track => track.stop());
+                }
             }
             isRecording = false;
             voiceInputContainer.classList.remove("recording");
