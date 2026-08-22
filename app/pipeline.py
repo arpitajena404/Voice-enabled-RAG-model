@@ -40,21 +40,60 @@ def _generation_retry():
     )
 
 
+def _has_script_for_language(text: str, language_code: str) -> bool:
+    """Returns True if text contains native characters matching the language_code's script."""
+    if not text or not text.strip():
+        return False
+    if language_code == "en":
+        return all(ord(c) < 128 for c in text if c.isalnum())
+    
+    script_ranges = {
+        "hi": ('\u0900', '\u097F'),  # Devanagari
+        "mr": ('\u0900', '\u097F'),  # Devanagari
+        "bn": ('\u0980', '\u09FF'),  # Bengali
+        "as": ('\u0980', '\u09FF'),  # Assamese
+        "pa": ('\u0A00', '\u0A7F'),  # Gurmukhi
+        "gu": ('\u0A80', '\u0AFF'),  # Gujarati
+        "od": ('\u0B00', '\u0B7F'),  # Odia
+        "or": ('\u0B00', '\u0B7F'),  # Odia alias
+        "ta": ('\u0B80', '\u0BFF'),  # Tamil
+        "te": ('\u0C00', '\u0C7F'),  # Telugu
+        "kn": ('\u0C80', '\u0CFF'),  # Kannada
+        "ml": ('\u0D00', '\u0D7F'),  # Malayalam
+    }
+    
+    rng = script_ranges.get(language_code)
+    if not rng:
+        return False
+        
+    start, end = rng
+    return any(start <= c <= end for c in text)
+
+
 def _detect_query_language(query_text: str, fallback_lang: str) -> str:
-    """Auto-detects language based on character script (Hindi, Bengali, Tamil, Telugu, English)."""
+    """Auto-detects language based on character script (covers 11 Indic scripts and English)."""
     cleaned = "".join(c for c in query_text if c.isalnum())
     if not cleaned:
         return fallback_lang
     if any('\u0900' <= c <= '\u097F' for c in cleaned):
-        return "hi"
+        return "mr" if fallback_lang == "mr" else "hi"
     if any('\u0980' <= c <= '\u09FF' for c in cleaned):
-        return "bn"
+        return "as" if fallback_lang == "as" else "bn"
+    if any('\u0A00' <= c <= '\u0A7F' for c in cleaned):
+        return "pa"
+    if any('\u0A80' <= c <= '\u0AFF' for c in cleaned):
+        return "gu"
+    if any('\u0B00' <= c <= '\u0B7F' for c in cleaned):
+        return "od"
     if any('\u0B80' <= c <= '\u0BFF' for c in cleaned):
         return "ta"
     if any('\u0C00' <= c <= '\u0C7F' for c in cleaned):
         return "te"
-    if all(ord(c) < 128 for c in cleaned):
-        return "en"
+    if any('\u0C80' <= c <= '\u0CFF' for c in cleaned):
+        return "kn"
+    if any('\u0D00' <= c <= '\u0D7F' for c in cleaned):
+        return "ml"
+    # If query is in Latin/English characters or other scripts, default to user's selected target language
     return fallback_lang
 
 
@@ -92,12 +131,24 @@ class RAGPipeline:
             if audio_bytes:
                 async with timed_stage("stt") as t_stt:
                     try:
-                        stt_result = await transcribe_audio(
-                            audio_bytes, audio_filename, language_code=language
-                        )
-                        query = stt_result.text
-                        transcription_result = stt_result
+                        # Only reuse browser STT text if its script matches native script of target language
+                        has_matching_script = _has_script_for_language(query or "", language)
+                        if not config.SARVAM_API_KEY and query and query.strip() and has_matching_script:
+                            # Preserves the user's real-time spoken text captured via browser Web Speech STT
+                            transcription_result = TranscriptionResult(
+                                text=query,
+                                language_code=language,
+                                latency_ms=t_stt.latency_ms,
+                                used_fallback=True,
+                            )
+                        else:
+                            stt_result = await transcribe_audio(
+                                audio_bytes, audio_filename, language_code=language
+                            )
+                            query = stt_result.text
+                            transcription_result = stt_result
                     except Exception as e:
+
                         logger.exception("STT Transcription failed")
                         latencies["stt"] = t_stt.latency_ms
 

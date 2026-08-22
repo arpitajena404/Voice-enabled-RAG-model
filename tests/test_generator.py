@@ -19,3 +19,15 @@ async def test_generate_answer_simulated_no_context():
     assert isinstance(res, RAGResponse)
     assert res.refusal is True
     assert res.grounded is False
+
+@pytest.mark.asyncio
+async def test_generate_answer_simulated_odia():
+    passages = [
+        {"text": "Ensure accurate blood pressure readings by sitting quietly for 5 minutes.", "url": "https://example.org/bp"}
+    ]
+    res = await generate_answer("ରକ୍ତଚାପର ସଠିକ୍ ରିଡିଂ ପାଇବା ପାଇଁ ପ୍ରକ୍ରିୟା କ’ଣ?", passages, language="od")
+    assert isinstance(res, RAGResponse)
+    assert res.grounded is True
+    assert res.refusal is False
+    assert "ସଠିକ୍" in res.answer or "ରକ୍ତଚାପ" in res.answer
+

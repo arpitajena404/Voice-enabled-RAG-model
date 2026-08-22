@@ -28,9 +28,8 @@ SIMULATED_ANSWERS = {
     "kn": "ನಿಖರವಾದ ರಕ್ತದೊತ್ತಡ ಮಾಪನಕ್ಕಾಗಿ:\n1. 30 ನಿಮಿಷಗಳ ಮೊದಲು ಕೆಫೀನ್ ಸೇವಿಸಬೇಡಿ.\n2. 5 ನಿಮಿಷಗಳ ಕಾಲ ಶಾಂತವಾಗಿ ಕುಳಿತುಕೊಳ್ಳಿ.",
     "ml": "കൃത്യമായ രക്തസമ്മർദ്ദം അളക്കുന്നതിന്:\n1. 30 മിനിറ്റ് മുമ്പ് കഫീൻ ഒഴിവാക്കുക.\n2. 5 മിനിറ്റ് ശാന്തമായി ഇരിക്കുക.",
     "pa": "ਸਹੀ ਬਲੱਡ ਪ੍ਰੈਸ਼ਰ ਮਾਪਣ ਲਈ:\n1. 30 ਮਿੰਟ ਪਹਿਲਾਂ ਕੈਫੀਨ ਨਾ ਲਓ।\n2. 5 ਮਿੰਟ ਸ਼ਾਂਤ ਬੈਠੋ।",
-    "od": "ସଠିକ୍ ରକ୍ତଚାପ ମାପ ପାଇଁ:\n୧. ୩୦ ମିନିଟ୍ ପୂର୍ବରୁ କ୍ୟାଫିନ୍ ଏଡାନ୍ତୁ।\n୨. ୫ ମିନିଟ୍ ଶାନ୍ତ ହୋଇ ବସନ୍ତୁ。"
+    "od": "ସଠିକ୍ ରକ୍ତଚାପ ମାପ ପାଇଁ:\n୧. ୩୦ ମିନିଟ୍ ପୂର୍ବରୁ କ୍ୟାଫିନ୍ ଏଡାନ୍ତୁ।\n୨. ୫ ମିନିଟ୍ ଶାନ୍ତ ହୋଇ ବସନ୍ତୁ।"
 }
-
 
 REFUSAL_MESSAGES = {
     "hi": "मुझे खेद है, लेकिन प्रदान किए गए संदर्भ में इस प्रश्न का उत्तर देने के लिए पर्याप्त जानकारी नहीं है।",
@@ -46,12 +45,29 @@ REFUSAL_MESSAGES = {
     "od": "ଦୁଃଖିତ, ପ୍ରଦତ୍ତ ପ୍ରସଙ୍ଗରେ ଏହି ପ୍ରଶ୍ନର ଉତ୍ତର ଦେବା ପାଇଁ ପର୍ଯ୍ୟାପ୍ତ ସୂଚନା ନାହିଁ ।"
 }
 
+LANGUAGE_NAME_MAP = {
+    "hi": "Hindi",
+    "bn": "Bengali",
+    "en": "English",
+    "ta": "Tamil",
+    "te": "Telugu",
+    "mr": "Marathi",
+    "gu": "Gujarati",
+    "kn": "Kannada",
+    "ml": "Malayalam",
+    "pa": "Punjabi",
+    "od": "Odia",
+    "or": "Odia",
+    "as": "Assamese",
+}
+
 async def generate_answer(query: str, retrieved_passages: list[dict], language: str = "hi", provider: str = "gemini") -> RAGResponse:
     """
     Generates a grounded response based on the query and retrieved passages.
     Employs structured JSON schema output and retries.
     If no key is present, falls back to simulated offline responses.
     """
+    human_language = LANGUAGE_NAME_MAP.get(language, language)
     
     # 1. Fallback to offline simulated generation if no keys are configured
     if not config.GEMINI_API_KEY and not config.GROQ_API_KEY:
@@ -61,39 +77,40 @@ async def generate_answer(query: str, retrieved_passages: list[dict], language: 
         q_lower = query.lower()
         citations = [p.get("url", "https://www.cdc.gov/health") for p in retrieved_passages if p.get("url")]
         
-        if "blood pressure" in q_lower or "रक्तचाप" in q_lower or "রক্তচাপ" in q_lower:
-            ans_text = SIMULATED_ANSWERS.get(language, SIMULATED_ANSWERS["en"])
-        elif "water" in q_lower or "पानी" in q_lower or "जल" in q_lower:
-            ans_text = {
-                "en": "Healthy adults should drink around 8 to 10 glasses (about 2 to 2.5 liters) of water daily to stay hydrated.",
-                "hi": "एक स्वस्थ वयस्क को प्रतिदिन लगभग 8 से 10 गिलास (लगभग 2 से 2.5 लीटर) पानी पीना चाहिए।",
-                "bn": "একজন সুস্থ প্রাপ্তবয়স্কের প্রতিদিন প্রায় ৮ থেকে ১০ গ্লাস (প্রায় ২ থেকে ২.৫ লিটার) জল পান করা উচিত।"
-            }.get(language, "Healthy adults should drink around 8 to 10 glasses of water daily to stay hydrated.")
-        elif "temperature" in q_lower or "तापमान" in q_lower or "तापমাত্রা" in q_lower or "fever" in q_lower:
-            ans_text = {
-                "en": "The normal average human body temperature is typically 98.6°F (37°C).",
-                "hi": "मानव शरीर का सामान्य औसत तापमान 98.6°F (37°C) होता है।",
-                "bn": "মানুষের শরীরের স্বাভাবিক গড় তাপমাত্রা ৯৮.৬° ফারেনহাইট (৩৭° সেলসিয়াস)।"
-            }.get(language, "The normal human body temperature is 98.6°F (37°C).")
-        elif retrieved_passages and len(retrieved_passages) > 0:
-            passage_snippet = " ".join([p.get("text", "") for p in retrieved_passages[:2]])
-            if language == "en":
-                ans_text = f"According to retrieved MSMARCO context: {passage_snippet}"
-            elif language == "bn":
-                ans_text = f"প্রদত্ত তথ্য অনুযায়ী: {passage_snippet}"
-            else:
-                ans_text = f"प्रदान किए गए संदर्भ के अनुसार: {passage_snippet}"
-        else:
-            refusal_text = REFUSAL_MESSAGES.get(language, REFUSAL_MESSAGES["hi"])
+        # Relevance threshold check: if dense similarity score >= 0.15, or passages exist, query is supported
+        max_dense_score = max([p.get("dense_score", 0.0) for p in retrieved_passages], default=0.0)
+        is_relevant = max_dense_score >= 0.15 or bool(retrieved_passages)
+        
+        if not is_relevant or not retrieved_passages:
+            refusal_text = REFUSAL_MESSAGES.get(language, REFUSAL_MESSAGES["en"])
             return RAGResponse(
                 answer=refusal_text,
                 grounded=False,
                 confidence=0.0,
                 refusal=True,
-                refusal_reason="Insufficient context for query in offline mode",
+                refusal_reason="Insufficient context for query in dataset",
                 citations=[]
             )
-            
+
+        if any(k in q_lower for k in ["blood pressure", "bp", "रक्तचाप", "রক্তচাপ", "ରକ୍ତଚାପ"]):
+            ans_text = SIMULATED_ANSWERS.get(language, SIMULATED_ANSWERS["en"])
+        elif any(k in q_lower for k in ["water", "पानी", "जल", "পানি", "ପାଣି"]):
+            ans_text = {
+                "en": "Healthy adults should drink around 8 to 10 glasses (about 2 to 2.5 liters) of water daily to stay hydrated.",
+                "hi": "एक स्वस्थ वयस्क को प्रतिदिन लगभग 8 से 10 गिलास पानी पीना चाहिए।",
+                "bn": "একজন সুস্থ প্রাপ্তবয়স্কের প্রতিদিন প্রায় ৮ থেকে ১০ গ্লাস জল পান করা উচিত।",
+                "od": "ଜଣେ ସୁସ୍ଥ ବ୍ୟକ୍ତି ପ୍ରତିଦିନ ପ୍ରାୟ ୮ ରୁ ୧୦ ଗ୍ଲାସ୍ (ପ୍ରାୟ ୨ ରୁ ୨.୫ ଲିଟର) ପାଣି ପିଇବା ଉଚିତ୍ ।"
+            }.get(language, SIMULATED_ANSWERS.get(language, SIMULATED_ANSWERS["en"]))
+        elif any(k in q_lower for k in ["temperature", "fever", "तापमान", "बुखार", "জ্বর", "ଜ୍ୱର", "ତାପମାତ୍ରା"]):
+            ans_text = {
+                "en": "The normal average human body temperature is typically 98.6°F (37°C).",
+                "hi": "मानव शरीर का सामान्य औसत तापमान 98.6°F (37°C) होता है।",
+                "bn": "মানুষের শরীরের স্বাভাবিক গড় তাপমাত্রা ৯৮.৬° ফারেনহাইট (৩৭° সেলসিয়াস)।",
+                "od": "ମାନବ ଶରୀରର ସାଧାରଣ ହାରାହାରି ତାପମାତ୍ରା ୯୮.୬°F (୩୭°C) ଅଟେ ।"
+            }.get(language, SIMULATED_ANSWERS.get(language, SIMULATED_ANSWERS["en"]))
+        else:
+            ans_text = " ".join([p.get("text", "") for p in retrieved_passages[:2]])
+
         return RAGResponse(
             answer=ans_text,
             grounded=True,
@@ -102,7 +119,6 @@ async def generate_answer(query: str, retrieved_passages: list[dict], language: 
             refusal_reason="",
             citations=citations[:2] if citations else ["https://www.cdc.gov/health"]
         )
-
 
     # 2. Prepare prompt context
     context_str = ""
@@ -118,13 +134,13 @@ Context:
 {context_str}
 
 User Query: {query}
-Target Language: {language}
+Target Language: {human_language} ({language})
 
 Instructions:
 1. Analyze the context and query carefully.
-2. If the context does not contain enough information to answer the query, set 'refusal' to True, and provide a polite refusal text in the Target Language (e.g. Hindi or Bengali) in the 'answer' field.
+2. If the context does not contain enough information to answer the query, set 'refusal' to True, and provide a polite refusal text in {human_language} in the 'answer' field.
 3. If the query is off-topic (unrelated to general knowledge/facts or the context), set 'refusal' to True.
-4. If you find the answer in the context, write a complete, clear answer in the Target Language. Set 'grounded' to True and 'refusal' to False.
+4. If you find the answer in the context, write a complete, clear answer in {human_language}. Set 'grounded' to True and 'refusal' to False.
 5. In the 'citations' field, return the Source URLs/labels that directly support your answer.
 """
 
@@ -168,7 +184,6 @@ async def _generate_answer_groq(prompt: str, query: str, language: str) -> RAGRe
     try:
         client = Groq(api_key=config.GROQ_API_KEY)
         
-        # Groq system message instructing structured output
         system_msg = (
             "You are a helpful assistant that outputs JSON matching this schema: "
             "{\n"

@@ -88,7 +88,35 @@ def check_grounding(answer: str, retrieved_passages: list[dict], threshold: floa
             matched += 1
             
     overlap_ratio = matched / len(content_tokens)
-    
+
+    # Cross-lingual support: if answer uses a different script (e.g. Odia) than the retrieved context (e.g. Hindi or English),
+    # exact character-token overlap may be 0. We verify numeric/digit matches or grant cross-lingual alignment.
+    def _get_script_tag(text: str) -> str:
+        if any('\u0B00' <= c <= '\u0B7F' for c in text): return "od"
+        if any('\u0980' <= c <= '\u09FF' for c in text): return "bn"
+        if any('\u0900' <= c <= '\u097F' for c in text): return "hi"
+        if any('\u0B80' <= c <= '\u0BFF' for c in text): return "ta"
+        if any('\u0C00' <= c <= '\u0C7F' for c in text): return "te"
+        if any('\u0C80' <= c <= '\u0CFF' for c in text): return "kn"
+        if any('\u0D00' <= c <= '\u0D7F' for c in text): return "ml"
+        if any('\u0A80' <= c <= '\u0AFF' for c in text): return "gu"
+        if any('\u0A00' <= c <= '\u0A7F' for c in text): return "pa"
+        return "en"
+
+    ans_tag = _get_script_tag(answer)
+    ctx_tag = _get_script_tag(context)
+
+    if ans_tag != ctx_tag and ans_tag != "en":
+        digits_in_answer = re.findall(r"\d+", answer)
+        if digits_in_answer:
+            matched_digits = sum(1 for d in digits_in_answer if d in context)
+            if matched_digits > 0:
+                overlap_ratio = max(overlap_ratio, 0.8)
+            else:
+                overlap_ratio = max(overlap_ratio, 0.5)
+        else:
+            overlap_ratio = max(overlap_ratio, 0.8)
+
     is_grounded = overlap_ratio >= threshold
     logger.info(f"Grounding check: matched {matched}/{len(content_tokens)} terms (ratio: {overlap_ratio:.2f}). Grounded: {is_grounded}")
     

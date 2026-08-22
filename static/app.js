@@ -120,6 +120,70 @@ const document_ready = () => {
         }
     });
 
+    const BROWSER_STT_LANG_MAP = {
+        "hi": "hi-IN",
+        "bn": "bn-IN",
+        "en": "en-US",
+        "ta": "ta-IN",
+        "te": "te-IN",
+        "mr": "mr-IN",
+        "gu": "gu-IN",
+        "kn": "kn-IN",
+        "ml": "ml-IN",
+        "pa": "pa-IN",
+        "od": "or-IN",
+        "or": "or-IN",
+        "as": "as-IN"
+    };
+
+    let speechRecognizer = null;
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    function startSpeechRecognition() {
+        if (!SpeechRecognition) return;
+        try {
+            speechRecognizer = new SpeechRecognition();
+            speechRecognizer.continuous = true;
+            speechRecognizer.interimResults = true;
+            speechRecognizer.lang = BROWSER_STT_LANG_MAP[langSelect.value] || "hi-IN";
+
+            speechRecognizer.onresult = (event) => {
+                let transcript = "";
+                for (let i = event.resultIndex; i < event.results.length; ++i) {
+                    transcript += event.results[i][0].transcript;
+                }
+                const trimmed = transcript.trim();
+                if (trimmed) {
+                    const targetLang = langSelect.value;
+                    const isEnglishText = /^[\x00-\x7F\s\.,!\?'-]+$/.test(trimmed);
+                    if (targetLang !== "en" && isEnglishText) {
+                        stateText.textContent = `Listening (${targetLang.toUpperCase()}): Recording spoken audio...`;
+                    } else {
+                        queryInput.value = trimmed;
+                        stateText.textContent = `Listening (${targetLang.toUpperCase()}): "${trimmed}"`;
+                    }
+                }
+            };
+
+            speechRecognizer.onerror = (e) => {
+                console.warn("Speech recognition error:", e.error);
+            };
+
+            speechRecognizer.start();
+        } catch (e) {
+            console.warn("Could not start SpeechRecognition:", e);
+        }
+    }
+
+    function stopSpeechRecognition() {
+        if (speechRecognizer) {
+            try {
+                speechRecognizer.stop();
+            } catch (e) {}
+            speechRecognizer = null;
+        }
+    }
+
     // Audio recording events
     recordBtn.addEventListener("click", async () => {
         if (!isRecording) {
@@ -157,21 +221,24 @@ const document_ready = () => {
                     const finalType = (mediaRecorder && mediaRecorder.mimeType) ? mediaRecorder.mimeType : 'audio/webm';
                     recordedAudioBlob = new Blob(audioChunks, { type: finalType });
                     showToast("Audio recorded! Click 'Submit Query' to process.");
-                    queryInput.value = ""; // Clear text if audio exists
-                    queryInput.placeholder = "🎤 Audio question recorded. Click Submit Query to process.";
+                    if (!queryInput.value.trim()) {
+                        queryInput.placeholder = "🎤 Audio question recorded. Click Submit Query to process.";
+                    }
                 };
                 
                 mediaRecorder.start(100);
+                startSpeechRecognition();
                 isRecording = true;
                 voiceInputContainer.classList.add("recording");
-                stateText.textContent = "Recording... Click microphone again to stop";
-                showToast("Microphone active. Recording...");
+                stateText.textContent = "Listening... Speak your question or type it below.";
+                showToast("Microphone active. Listening...");
             } catch (err) {
                 console.error("Microphone access error:", err);
                 showToast("Could not access microphone: " + (err.message || "Permission denied"));
             }
         } else {
             // Stop recording
+            stopSpeechRecognition();
             if (mediaRecorder && mediaRecorder.state !== "inactive") {
                 mediaRecorder.stop();
                 if (mediaRecorder.stream) {
@@ -180,9 +247,10 @@ const document_ready = () => {
             }
             isRecording = false;
             voiceInputContainer.classList.remove("recording");
-            stateText.textContent = "Audio recorded. Click to re-record";
+            stateText.textContent = queryInput.value.trim() ? `Voice Transcribed: "${queryInput.value.trim()}"` : "Audio recorded. Click to re-record";
         }
     });
+
 
     // Submit Query
     submitBtn.addEventListener("click", async () => {
@@ -203,11 +271,13 @@ const document_ready = () => {
         formData.append("provider", providerSelect.value);
         formData.append("top_k", topkSelect.value);
 
-        if (recordedAudioBlob) {
-            formData.append("audio_file", recordedAudioBlob, "recording.webm");
-        } else {
+        if (textQuery) {
             formData.append("query_text", textQuery);
         }
+        if (recordedAudioBlob) {
+            formData.append("audio_file", recordedAudioBlob, "recording.webm");
+        }
+
 
         try {
             const response = await fetch("/api/query", {
@@ -238,6 +308,10 @@ const document_ready = () => {
     function renderResponse(data) {
         resultCard.classList.remove("hidden");
         resultCard.scrollIntoView({ behavior: 'smooth' });
+
+        if (data.query) {
+            queryInput.value = data.query;
+        }
 
         // Transcription
         transcriptionText.textContent = data.query || "(No voice transcription parsed)";
