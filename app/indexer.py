@@ -177,15 +177,16 @@ class IndicIndexer:
             logger.exception(f"Error loading {strategy} index")
             return False
 
-    def get_index(self, strategy: str) -> dict:
+    def get_index(self, strategy: str, force_reload: bool = False) -> dict:
         """
-        Returns the index dictionary for the strategy. Loads it if not already in memory.
+        Returns the index dictionary for the strategy. Loads it from disk if not in memory or force_reload is True.
         """
-        if strategy not in self.indices:
+        if strategy not in self.indices or force_reload:
             success = self.load_index(strategy)
             if not success:
                 raise RuntimeError(f"Index for strategy '{strategy}' is not loaded and could not be found on disk. Run seed_database.py first.")
         return self.indices[strategy]
+
         
 # Instantiate global indexer
 indexer = IndicIndexer()

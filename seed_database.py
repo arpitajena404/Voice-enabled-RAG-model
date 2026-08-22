@@ -41,7 +41,23 @@ MOCK_EXAMPLES = [
         "passages": {
             "passage_text": [
                 "রক্তচাপ পরিমাপ করার ৩০ মিনিট আগে ক্যাফেইনযুক্ত পানীয় পান বা ব্যায়াম করবেন না। পরীক্ষা শুরু করার আগে ৫ মিনিট শান্ত হয়ে বসুন।",
-                "পরিমাপের সময় মেরুদণ্ড সোजा করে চেয়ারে বসুন, পা মেঝেতে সমান্তরাল রাখুন এবং বাহুটি হৃৎপিণ্ডের স্তরের কাছাকাছি রাখুন। কাফের স্ফীত অংশ আপনার বাহুর অন্তত ৮০% অংশ ঢেকে রাখা উচিত। অন্তত দুটি পরিমাপ নিয়ে ফলাফল গড় করুন।"
+                "পরিমাপের সময় মেরুদণ্ড সোজা করে চেয়ারে বসুন, পা মেঝেতে সমান্তরাল রাখুন এবং বাহুটি হৃৎপিণ্ডের স্তরের কাছাকাছি রাখুন। কাফের স্ফীত অংশ আপনার বাহুর অন্তত ৮০% অংশ ঢেকে রাখা উচিত। অন্তত দুটি পরিমাপ নিয়ে ফলাফল গড় করুন।"
+            ],
+            "url": ["https://www.healthline.com/health/high-blood-pressure", "https://www.cdc.gov/bloodpressure"],
+            "is_selected": [1, 1]
+        }
+    },
+    {
+        "language": "en",
+        "query_id": "111197",
+        "query": "What is the procedure to get accurate blood pressure reading?",
+        "answers": ["To get an accurate blood pressure reading: 1. Avoid caffeine and exercise 30 minutes before. 2. Rest quietly for 5 minutes. 3. Sit upright with feet flat on the floor and support your arm at heart level. 4. Ensure cuff covers 80% of upper arm. 5. Take two readings 1-2 minutes apart and average them."],
+        "original_query": "What is the procedure to get accurate blood pressure reading?",
+        "original_answers": ["1. Avoid caffeine/exercise 30 mins before. 2. Rest 5 mins. 3. Sit with feet flat. 4. Arm at heart level. 5. Average two readings."],
+        "passages": {
+            "passage_text": [
+                "Do not drink caffeinated beverages or exercise 30 minutes before taking your blood pressure measurement. Sit quietly for five minutes before beginning the test.",
+                "During measurement, sit in a chair with your feet flat on the floor and support your arm so your elbow is at about heart level. The inflatable part of the cuff should completely cover at least 80% of your upper arm. Take at least two readings spaced 1-2 minutes apart, and average the results."
             ],
             "url": ["https://www.healthline.com/health/high-blood-pressure", "https://www.cdc.gov/bloodpressure"],
             "is_selected": [1, 1]
@@ -110,7 +126,40 @@ MOCK_EXAMPLES = [
             "url": ["https://www.webmd.com/first-aid/normal-body-temperature", "https://www.medicalnewstoday.com/articles/normal-body-temperature"],
             "is_selected": [1, 0]
         }
+    },
+    {
+        "language": "en",
+        "query_id": "222201",
+        "query": "Why is water hydration important for health?",
+        "answers": ["Drinking enough water is essential to keep the body hydrated and flush out toxins. Health experts recommend drinking at least 8-10 glasses of water daily."],
+        "original_query": "how much water to drink in a day for health",
+        "original_answers": ["Generally 8-10 glasses (around 2-2.5 liters) is recommended daily."],
+        "passages": {
+            "passage_text": [
+                "Drinking enough water is essential to keep the body hydrated and flush out harmful toxins. Health experts recommend drinking at least 8-10 glasses of water daily.",
+                "Water requirements increase during hot weather or physical exercise. Drinking too little water can cause dehydration, leading to headaches and fatigue."
+            ],
+            "url": ["https://www.mayoclinic.org/healthy-lifestyle/nutrition", "https://www.webmd.com/diet/water-requirements"],
+            "is_selected": [1, 0]
+        }
+    },
+    {
+        "language": "en",
+        "query_id": "333302",
+        "query": "What is normal human body temperature?",
+        "answers": ["The average normal human body temperature is generally accepted as 98.6°F (37°C)."],
+        "original_query": "what is normal human body temperature",
+        "original_answers": ["The normal human body temperature is typically 98.6°F (37°C)."],
+        "passages": {
+            "passage_text": [
+                "The normal average human body temperature is generally accepted as 98.6°F (37°C), although it can fluctuate between 97°F and 99°F depending on the time of day.",
+                "A body temperature reading over 100.4°F (38°C) is considered a fever, indicating the body is fighting off an infection."
+            ],
+            "url": ["https://www.webmd.com/first-aid/normal-body-temperature", "https://www.medicalnewstoday.com/articles/normal-body-temperature"],
+            "is_selected": [1, 0]
+        }
     }
+
 ]
 
 def seed(limit_per_language: int = 100, use_online_hf: bool = False):

@@ -37,7 +37,7 @@ class TextQueryRequest(BaseModel):
 
 @app.on_event("startup")
 def startup_event():
-    """Verify index status on startup."""
+    """Verify index status and pre-warm embedding model on startup."""
     logger.info("Server starting up...")
     # Attempt to load indexes for semantic strategy to check if seeded
     semantic_dense = config.INDEX_DIR / "semantic_dense.npy"
@@ -47,6 +47,18 @@ def startup_event():
             seed_database.seed(limit_per_language=10)
         except Exception as e:
             logger.error(f"Auto-seeding failed: {e}. Index will need to be generated manually.")
+    
+    # Pre-warm embedding model and index in RAM for sub-100ms first query latency
+    try:
+        logger.info("Pre-warming sentence-transformer embedding model...")
+        indexer.get_embedding_model()
+        indexer.indices.clear()
+        indexer.get_index("semantic", force_reload=True)
+        logger.info("Embedding model and indices pre-warmed successfully.")
+    except Exception as e:
+        logger.warning(f"Embedding model pre-warming warning: {e}")
+
+
 
 @app.post("/api/query")
 async def handle_query(
@@ -91,8 +103,18 @@ def get_languages():
     """Returns supported languages."""
     return [
         {"code": "hi", "name": "Hindi (हिन्दी)"},
-        {"code": "bn", "name": "Bengali (বাংলা)"}
+        {"code": "bn", "name": "Bengali (বাংলা)"},
+        {"code": "en", "name": "English"},
+        {"code": "ta", "name": "Tamil (தமிழ்)"},
+        {"code": "te", "name": "Telugu (తెలుగు)"},
+        {"code": "mr", "name": "Marathi (मराठी)"},
+        {"code": "gu", "name": "Gujarati (ગુજરાતી)"},
+        {"code": "kn", "name": "Kannada (ಕನ್ನಡ)"},
+        {"code": "ml", "name": "Malayalam (മലയാളം)"},
+        {"code": "pa", "name": "Punjabi (ਪੰਜਾਬੀ)"},
+        {"code": "od", "name": "Odia (ଓଡ଼ਿଆ)"}
     ]
+
 
 @app.get("/api/stats")
 def get_stats(strategy: str = "semantic"):
@@ -109,10 +131,12 @@ def get_stats(strategy: str = "semantic"):
 def trigger_seed(limit: int = 100):
     """Triggers database indexing manually."""
     try:
+        indexer.indices.clear()
         seed_database.seed(limit)
         return {"status": "success", "message": "Database seeded successfully."}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Seeding failed: {str(e)}")
+
 
 # Mount static folder for the frontend dashboard
 STATIC_DIR = Path(__file__).resolve().parent / "static"
