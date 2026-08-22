@@ -28,5 +28,7 @@ class Config:
     INDEX_DIR.mkdir(parents=True, exist_ok=True)
     DATA_DIR.mkdir(parents=True, exist_ok=True)
 
+    LIGHTWEIGHT_MODE = os.getenv("LIGHTWEIGHT_MODE", "false").lower() == "true"
+
 # Instantiate config
 config = Config()

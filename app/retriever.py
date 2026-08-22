@@ -1,6 +1,7 @@
 import logging
 import numpy as np
 from app.indexer import indexer
+from app.config import config
 
 logger = logging.getLogger(__name__)
 
@@ -42,30 +43,26 @@ def retrieve_passages(query: str, strategy: str = "semantic", top_k: int = 3, hy
 
     # 1. Dense Retrieval Score (Cosine Similarity)
     #
-    # Always embed the query with the same real model used to embed the
-    # documents in indexer.py. A random-vector fallback was used here
-    # previously to skip model overhead when no LLM API key was set — but
-    # the embedding model is a local sentence-transformers model with no
-    # API key requirement at all, so that condition never had anything to
-    # do with whether real embeddings were available. The practical effect
-    # was that dense retrieval returned meaningless (random) similarity
-    # scores by default, leaving only the sparse/TF-IDF half doing real
-    # work. The model is lazy-loaded and cached (see get_embedding_model),
-    # so encoding one short query string here costs milliseconds once
-    # warm — not a meaningful hit to the 200ms budget.
-    model = indexer.get_embedding_model()
-    query_emb = model.encode(query, show_progress_bar=False)
-    query_emb = np.array(query_emb, dtype=np.float32)
-    
-    # Norms for division
-    q_norm = np.linalg.norm(query_emb)
-    doc_norms = np.linalg.norm(dense_matrix, axis=1)
-    doc_norms[doc_norms == 0] = 1e-10
-    
-    if q_norm > 0:
-        dense_scores = np.dot(dense_matrix, query_emb) / (doc_norms * q_norm)
-    else:
+    # In LIGHTWEIGHT_MODE, skip loading the embedding model entirely — this
+    # is the change that keeps torch out of memory on constrained hosts.
+    # Dense scores become all-zero, so ranking falls back to sparse
+    # (TF-IDF) only. This is a deliberate degraded-but-functional mode for
+    # memory-limited deployments, not a bug.
+    if config.LIGHTWEIGHT_MODE:
         dense_scores = np.zeros(len(chunks))
+    else:
+        model = indexer.get_embedding_model()
+        query_emb = model.encode(query, show_progress_bar=False)
+        query_emb = np.array(query_emb, dtype=np.float32)
+
+        doc_norms = np.linalg.norm(dense_matrix, axis=1)
+        doc_norms[doc_norms == 0] = 1e-10
+        q_norm = np.linalg.norm(query_emb)
+
+        if q_norm > 0:
+            dense_scores = np.dot(dense_matrix, query_emb) / (doc_norms * q_norm)
+        else:
+            dense_scores = np.zeros(len(chunks))
         
     # 2. Sparse Retrieval Score (TF-IDF Similarity)
     query_sparse = tfidf.transform([query])

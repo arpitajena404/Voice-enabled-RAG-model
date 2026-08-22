@@ -48,15 +48,24 @@ def startup_event():
         except Exception as e:
             logger.error(f"Auto-seeding failed: {e}. Index will need to be generated manually.")
     
-    # Pre-warm embedding model and index in RAM for sub-100ms first query latency
-    try:
-        logger.info("Pre-warming sentence-transformer embedding model...")
-        indexer.get_embedding_model()
-        indexer.indices.clear()
-        indexer.get_index("semantic", force_reload=True)
-        logger.info("Embedding model and indices pre-warmed successfully.")
-    except Exception as e:
-        logger.warning(f"Embedding model pre-warming warning: {e}")
+    # Pre-warm embedding model and index in RAM, UNLESS running in
+    # lightweight mode (set via LIGHTWEIGHT_MODE=true on memory-constrained
+    # hosts like Railway's free tier). Skipping get_embedding_model() means
+    # torch/sentence-transformers never gets imported at all, avoiding the
+    # ~700MB+ memory spike that was crashing the container. Sparse (TF-IDF)
+    # retrieval still works fully in this mode; only dense/hybrid scoring
+    # is disabled.
+    if config.LIGHTWEIGHT_MODE:
+        logger.info("LIGHTWEIGHT_MODE enabled — skipping embedding model pre-warm to conserve memory.")
+    else:
+        try:
+            logger.info("Pre-warming sentence-transformer embedding model...")
+            indexer.get_embedding_model()
+            indexer.indices.clear()
+            indexer.get_index("semantic", force_reload=True)
+            logger.info("Embedding model and indices pre-warmed successfully.")
+        except Exception as e:
+            logger.warning(f"Embedding model pre-warming warning: {e}")
 
 
 
